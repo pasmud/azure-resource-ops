@@ -150,3 +150,16 @@ python -m pytest -q
 
 GitHub Actions runs lint, the offline suite, and an installed-command smoke
 test on Python 3.11 and 3.14 on pushes and pull requests.
+
+### Saved-inventory regression vectors
+
+Run `python -m pytest -q tests/test_regression_vectors.py` to check the synthetic
+inventories in `tests/regression_vectors/`. The cases cover exact per-resource
+merge deltas, subscription/group/type intersections, ARM child and extension
+paths, refreshed snapshots, and invalid exports. The harness also checks no-op
+exit codes and exact redacted audit reports. Each file is self-contained and
+can be run on its own with `-k <filename-slug>`.
+
+To materialize the JSON from the scenario tables, run
+`python tests/generate_regression_vectors.py`. Expected targets and assignments
+come from those tables; the generator does not import or run the planner.
