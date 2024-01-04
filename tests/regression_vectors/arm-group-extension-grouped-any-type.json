@@ -1,0 +1,116 @@
+{
+  "title": "Match grouped-any-type on a group-extension path",
+  "inventory": [
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1/slots/s",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/PROVIDERS/Fake.Monitor/checks/node:1",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/PROVIDERS/Fake.Monitor/checks/node:1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Team",
+      "Cost.Center"
+    ],
+    "resource_groups": [
+      "OPS"
+    ]
+  },
+  "expected": {
+    "exit_code": 4,
+    "changes": [
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops",
+        "merge": {
+          "Env": "ready"
+        }
+      },
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1",
+        "merge": {
+          "Env": "ready"
+        }
+      },
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1/slots/s",
+        "merge": {
+          "Env": "ready"
+        }
+      },
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/PROVIDERS/Fake.Monitor/checks/node:1",
+        "merge": {
+          "Env": "ready"
+        }
+      }
+    ],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "changes_planned",
+      "summary": {
+        "scoped_subscription_count": 1,
+        "targeted_subscription_count": 1,
+        "resource_count": 4,
+        "assignment_count": 4
+      },
+      "changes": [
+        {
+          "change": 1,
+          "assignment_count": 1
+        },
+        {
+          "change": 2,
+          "assignment_count": 1
+        },
+        {
+          "change": 3,
+          "assignment_count": 1
+        },
+        {
+          "change": 4,
+          "assignment_count": 1
+        }
+      ]
+    },
+    "scope": {
+      "subscriptions": [
+        "aaaaaaaa-1111-4111-8111-111111111111"
+      ],
+      "protected": [
+        "cost.center",
+        "team"
+      ],
+      "resource_groups": [
+        "ops"
+      ]
+    }
+  }
+}
