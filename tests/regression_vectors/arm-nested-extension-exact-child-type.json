@@ -1,0 +1,86 @@
+{
+  "title": "Match exact-child-type on a nested-extension path",
+  "inventory": [
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1/slots/s",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1/slots/s/providers/Fake.Attach/links/upstream/rules/r/PROVIDERS/Fake.Attach/links/node:1/rules/leaf~1",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/PROVIDERS/Fake.Attach/links/node:1/rules/leaf~1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Team",
+      "Cost.Center"
+    ],
+    "resource_types": [
+      "Fake.Compute/hosts/slots"
+    ]
+  },
+  "expected": {
+    "exit_code": 4,
+    "changes": [
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Compute/hosts/node+1/slots/s",
+        "merge": {
+          "Env": "ready"
+        }
+      }
+    ],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "changes_planned",
+      "summary": {
+        "scoped_subscription_count": 1,
+        "targeted_subscription_count": 1,
+        "resource_count": 1,
+        "assignment_count": 1
+      },
+      "changes": [
+        {
+          "change": 1,
+          "assignment_count": 1
+        }
+      ]
+    },
+    "scope": {
+      "subscriptions": [
+        "aaaaaaaa-1111-4111-8111-111111111111"
+      ],
+      "protected": [
+        "cost.center",
+        "team"
+      ],
+      "resource_types": [
+        "fake.compute/hosts/slots"
+      ]
+    }
+  }
+}
