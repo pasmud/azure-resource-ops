@@ -1,0 +1,80 @@
+{
+  "title": "Match missing-group on a parent-extension path",
+  "inventory": [
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Storage/volumes/node+1/shares/s",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Storage/volumes/node+1/PROVIDERS/Fake.Auth/locks/node:1",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops/providers/Fake.Storage/volumes/node+1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/PROVIDERS/Fake.Auth/locks/node:1",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Ops",
+      "tags": {
+        "Team": "keep",
+        "env": "old"
+      }
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Team",
+      "Cost.Center"
+    ],
+    "resource_groups": [
+      "ops-next"
+    ],
+    "resource_types": [
+      "Fake.Auth/locks"
+    ]
+  },
+  "expected": {
+    "exit_code": 0,
+    "changes": [],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "no_changes",
+      "summary": {
+        "scoped_subscription_count": 1,
+        "targeted_subscription_count": 0,
+        "resource_count": 0,
+        "assignment_count": 0
+      },
+      "changes": []
+    },
+    "scope": {
+      "subscriptions": [
+        "aaaaaaaa-1111-4111-8111-111111111111"
+      ],
+      "protected": [
+        "cost.center",
+        "team"
+      ],
+      "resource_groups": [
+        "ops-next"
+      ],
+      "resource_types": [
+        "fake.auth/locks"
+      ]
+    }
+  }
+}
