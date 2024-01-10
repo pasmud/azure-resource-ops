@@ -23,6 +23,10 @@ These three commands require no Azure CLI, network, or credentials. Successful
 commands write JSON to stdout; invalid input exits 2 with a short diagnostic on
 stderr and no JSON output. `--help` describes the available flags.
 
+Use `plan --exit-code` in automation to distinguish a nonempty plan (exit `4`)
+from a no-op (exit `0`). Both outcomes write the same plan JSON as the default
+mode, which exits `0` on any successful plan. Invalid input still exits `2`.
+
 ### Inputs and merge semantics
 
 - **Inventory:** UTF-8 JSON array as saved from `az resource list`, or a

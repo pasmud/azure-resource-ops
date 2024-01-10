@@ -24,6 +24,8 @@ def main(argv: list[str] | None = None, *, azure_runner: Runner = run_az) -> int
     plan = commands.add_parser("plan", help="create a dry-run plan", allow_abbrev=False)
     plan.add_argument("--inventory", type=Path, required=True, help="saved inventory JSON")
     plan.add_argument("--policy", type=Path, required=True, help="local policy JSON")
+    plan.add_argument("--exit-code", action="store_true",
+                      help="exit 4 if changes are planned, still writing the plan to stdout")
     validate = commands.add_parser("validate", help="validate a saved plan offline", allow_abbrev=False)
     validate.add_argument("--plan", type=Path, required=True, help="saved version 1 plan JSON")
     validate.add_argument("--inventory", type=Path, help="also verify against the original saved inventory")
@@ -43,6 +45,8 @@ def main(argv: list[str] | None = None, *, azure_runner: Runner = run_az) -> int
             policy = Policy.parse(read_json(args.policy, "policy"))
             resources = parse_inventory(read_json(args.inventory, "inventory"))
             result = build_plan(resources, policy)
+            if args.exit_code and result["changes"]:
+                status = 4
         elif args.command == "audit":
             result = audit_plan(Plan.parse(read_json(args.plan, "plan")))
         elif args.command == "apply":

@@ -32,11 +32,20 @@ def test_module_dry_run_is_byte_stable_and_writes_only_plan(tmp_path):
     assert first.stdout == second.stdout
     assert "fake-owner" not in first.stdout
     assert [entry["id"] for entry in json.loads(first.stdout)["changes"]] == [BASE + "a", BASE + "z"]
+    changed = run_cli(*args, "--exit-code")
+    assert (changed.returncode, changed.stdout, changed.stderr) == (4, first.stdout, "")
+
+    inventory.write_text(json.dumps([{"id": BASE + "a", "tags": {"ENV": "demo", "second": ""}}]),
+                         encoding="utf-8")
+    converged = run_cli(*args, "--exit-code")
+    assert converged.returncode == 0
+    assert converged.stderr == ""
+    assert json.loads(converged.stdout)["changes"] == []
 
 
 def test_invalid_cli_input_has_no_partial_output_or_path(tmp_path):
     result = run_cli("plan", "--inventory", tmp_path / "fake-inventory",
-                     "--policy", tmp_path / "fake-private-file")
+                     "--policy", tmp_path / "fake-private-file", "--exit-code")
     assert result.returncode == 2
     assert result.stdout == ""
     assert result.stderr == "error: cannot read policy as UTF-8\n"
