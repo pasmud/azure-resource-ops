@@ -1,0 +1,87 @@
+{
+  "title": "Merge alpha env-rel and Zulu note-rel deltas independently",
+  "inventory": [
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Zulu",
+      "tags": {
+        "RELEASE": "CAFÉ",
+        "ENV": "ready",
+        "OWNER": "right",
+        "Billing": "west"
+      }
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/alpha-archive",
+      "tags": {
+        "Owner": "out of scope"
+      }
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/alpha",
+      "tags": {
+        "owner": "left",
+        "RELEASE.LEGACY": "keep",
+        "eNv": "",
+        "NOTE": ""
+      }
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready",
+      "Note": "",
+      "Release": "café"
+    },
+    "protected": [
+      "OwNeR",
+      "BILLING"
+    ],
+    "resource_groups": [
+      "ZULU",
+      "ALPHA"
+    ]
+  },
+  "expected": {
+    "exit_code": 4,
+    "changes": [
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/alpha",
+        "merge": {
+          "Env": "ready",
+          "Release": "café"
+        }
+      },
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/Zulu",
+        "merge": {
+          "Note": "",
+          "Release": "café"
+        }
+      }
+    ],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "changes_planned",
+      "summary": {
+        "scoped_subscription_count": 1,
+        "targeted_subscription_count": 1,
+        "resource_count": 2,
+        "assignment_count": 4
+      },
+      "changes": [
+        {
+          "change": 1,
+          "assignment_count": 2
+        },
+        {
+          "change": 2,
+          "assignment_count": 2
+        }
+      ]
+    }
+  }
+}
