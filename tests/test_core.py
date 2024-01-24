@@ -34,3 +34,34 @@ def test_merge_is_additive_scoped_and_case_insensitive():
 def test_invalid_policy_fails_closed(patch):
     with pytest.raises(InputError):
         Policy.parse({"subscriptions": [SUB], "ensure": {}, "protected": ["Owner"]} | patch)
+
+
+@pytest.mark.parametrize("patch", [
+    {"resource_groups": []}, {"resource_groups": ["*"]}, {"resource_groups": "fake-rg"},
+    {"resource_groups": ["fake-rg", "FAKE-RG"]}, {"resource_types": None},
+    {"resource_types": ["Fake.Provider/*"]}, {"resource_types": ["things"]},
+    {"resource_type": ["Fake.Provider/things"]},
+])
+def test_invalid_filters_do_not_fall_back_to_subscription_scope(patch):
+    with pytest.raises(InputError):
+        Policy.parse({"subscriptions": [SUB], "ensure": {"env": "demo"}, "protected": []} | patch)
+
+
+def test_filters_intersect_scope_and_match_full_types_from_arm_paths():
+    parent = RG + "/providers/Fake.Provider/things/demo"
+    child = parent + "/widgets/demo"
+    extension = child + "/providers/Other.Provider/extras/demo"
+    rows = [RG, parent, child, extension, child.replace(SUB, OTHER),
+            child.replace("fake-rg", "fake-rg-other"), child.replace("/resourceGroups/fake-rg", "")]
+    base = {"subscriptions": [SUB], "ensure": {"env": "demo"}, "protected": []}
+
+    def planned(**filters):
+        policy = Policy.parse(base | filters)
+        return [change["id"] for change in build_plan([Resource(rid, {}) for rid in rows], policy)["changes"]]
+
+    assert planned(resource_groups=["FAKE-RG"], resource_types=["Other.Provider/extras", "FAKE.Provider/things/widgets"]) == [
+        child, extension,
+    ]
+    assert planned(resource_types=["Fake.Provider/things"]) == [parent]
+    assert planned(resource_groups=["fake-rg"], resource_types=["Microsoft.Resources/resourceGroups"]) == [RG]
+    assert planned(resource_groups=["typo"]) == []

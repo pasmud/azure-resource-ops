@@ -44,3 +44,14 @@ def test_rejects_duplicate_target_with_different_casing(plan):
     plan["changes"].append(plan["changes"][0] | {"id": RID.upper()})
     with pytest.raises(InputError, match="duplicate resource ID"):
         Plan.parse(plan)
+
+
+@pytest.mark.parametrize("id_suffix", ["-other", "/providers/Fake.Provider/things/other"])
+def test_saved_plan_retains_filters_and_rejects_targets_outside_them(plan, id_suffix):
+    plan["policy"].update(resource_groups=["fake"], resource_types=["microsoft.resources/resourcegroups"])
+    parsed = Plan.parse(plan)
+    assert parsed.as_dict() == plan
+    parsed.verify_inventory([Resource(RID, {}), Resource(RID + id_suffix, {})])
+    plan["changes"][0]["id"] += id_suffix
+    with pytest.raises(InputError, match="outside plan policy scope"):
+        Plan.parse(plan)

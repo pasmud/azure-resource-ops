@@ -3,7 +3,7 @@
 import re
 from dataclasses import dataclass
 
-from .core import InputError, Policy, Resource, build_plan, resource_subscription, tags
+from .core import InputError, Policy, Resource, build_plan, resource_scope, tags
 
 _DIGEST = re.compile(r"[0-9a-f]{64}")
 
@@ -61,8 +61,8 @@ class Plan:
 def _parse_change(row: object, policy: Policy) -> Change:
     if not isinstance(row, dict) or row.keys() != {"id", "before_sha256", "merge"}:
         raise InputError("expected exactly id, before_sha256, and merge")
-    if resource_subscription(row["id"]) not in policy.subscriptions:
-        raise InputError("resource is outside plan subscription scope")
+    if not policy.includes(resource_scope(row["id"])):
+        raise InputError("resource is outside plan policy scope")
     digest = row["before_sha256"]
     if not isinstance(digest, str) or not _DIGEST.fullmatch(digest):
         raise InputError("invalid tag snapshot digest")

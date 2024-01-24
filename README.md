@@ -41,13 +41,26 @@ mode, which exits `0` on any successful plan. Invalid input still exits `2`.
   including child and extension paths. Subscription roots, query parameters,
   encoded segments, and empty or relative path segments are rejected. ID
   segments are limited to ASCII letters, digits, and `_().:@+~-`.
-- **Policy:** Exactly `subscriptions` (nonempty, unique UUID list), `ensure`
+- **Policy:** Requires `subscriptions` (nonempty, unique UUID list), `ensure`
   (desired string-valued tags), and `protected` (unique names; may be empty).
   Managed names match `[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}`. Tag values are at most
   256 characters with no controls. Names are compared case-insensitively; values
   are exact. Attempting to manage a protected name is an error. A merge sets
   only changed or missing managed tags; it never deletes tags. `""` sets an
   empty string, not a deletion.
+- **Optional scope filters:** `resource_groups` and `resource_types` are
+  nonempty lists of exact case-insensitive names. A resource must match its
+  subscription and every supplied filter (any one entry within each list).
+  Group names are matched within the approved subscriptions, including the
+  group itself; subscription-level resources have no group. Use full ARM types
+  such as `Microsoft.Storage/storageAccounts` or
+  `Microsoft.Network/virtualNetworks/subnets`. A parent type does not match
+  children. Extension resources match their final provider/type path; resource
+  groups use `Microsoft.Resources/resourceGroups`. Both fields are derived from
+  the resource ID, not inventory metadata. Empty lists, wildcards, duplicates,
+  and unknown policy fields are errors. A valid filter with no matches plans no
+  changes. Any filters are embedded in the plan and enforced during validation
+  and apply.
 
 ### Plan and audit artifacts
 
