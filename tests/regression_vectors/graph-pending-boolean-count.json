@@ -1,0 +1,39 @@
+{
+  "title": "Read pending Graph export: boolean-count",
+  "inventory": {
+    "data": [
+      {
+        "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/beta",
+        "tags": {
+          "env": "READY",
+          "Owner": "keep"
+        }
+      },
+      {
+        "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/alpha",
+        "tags": null
+      }
+    ],
+    "count": false
+  },
+  "policy": {
+    "subscriptions": [
+      "bbbbbbbb-2222-4222-8222-222222222222",
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Owner"
+    ],
+    "resource_groups": [
+      "BETA",
+      "alpha"
+    ]
+  },
+  "expected": {
+    "exit_code": 2,
+    "error": "inventory row count does not match response metadata"
+  }
+}
