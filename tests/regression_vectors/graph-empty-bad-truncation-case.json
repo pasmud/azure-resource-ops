@@ -1,0 +1,27 @@
+{
+  "title": "Read empty Graph export: bad-truncation-case",
+  "inventory": {
+    "data": [],
+    "result_truncated": "False"
+  },
+  "policy": {
+    "subscriptions": [
+      "bbbbbbbb-2222-4222-8222-222222222222",
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Owner"
+    ],
+    "resource_groups": [
+      "BETA",
+      "alpha"
+    ]
+  },
+  "expected": {
+    "exit_code": 2,
+    "error": "inventory is truncated or has an invalid truncation flag"
+  }
+}
