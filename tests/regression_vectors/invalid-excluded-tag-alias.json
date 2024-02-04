@@ -1,0 +1,38 @@
+{
+  "title": "Reject tag-alias on excluded row before emitting a plan",
+  "inventory": [
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/alpha",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/beta",
+      "tags": {
+        "Owner": "a",
+        "OWNER": "b"
+      }
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Owner"
+    ],
+    "resource_groups": [
+      "ALPHA"
+    ],
+    "resource_types": [
+      "Microsoft.Resources/resourceGroups",
+      "Fake.Provider/things"
+    ]
+  },
+  "expected": {
+    "exit_code": 2,
+    "error": "inventory row 2: duplicate case-insensitive tag name"
+  }
+}
