@@ -39,3 +39,17 @@ def test_invalid_cli_input_has_no_partial_output_or_path(tmp_path):
     assert result.returncode == 2
     assert result.stdout == ""
     assert result.stderr == "error: cannot read policy as UTF-8\n"
+
+
+def test_validation_rejects_unknown_fields_without_echoing_them(tmp_path):
+    plan = tmp_path / "plan.json"
+    value = {"version": 1, "policy": {"subscriptions": [SUB], "ensure": {}, "protected": []}, "changes": []}
+    plan.write_text(json.dumps(value), encoding="utf-8")
+    valid = run_cli("validate", "--plan", plan)
+    assert valid.returncode == 0
+    assert json.loads(valid.stdout) == {"valid": True}
+    plan.write_text(json.dumps(value | {"fake-private-field": "fake-private-value"}), encoding="utf-8")
+    invalid = run_cli("validate", "--plan", plan)
+    assert invalid.returncode == 2
+    assert invalid.stdout == ""
+    assert "fake-private" not in invalid.stderr
