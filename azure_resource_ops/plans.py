@@ -20,6 +20,20 @@ class Plan:
     policy: Policy
     changes: tuple[Change, ...]
 
+    def as_dict(self) -> dict:
+        return {
+            "version": 1,
+            "policy": {
+                "subscriptions": list(self.policy.subscriptions),
+                "ensure": dict(self.policy.ensure),
+                "protected": sorted(self.policy.protected),
+            },
+            "changes": [
+                {"id": change.id, "before_sha256": change.before_sha256, "merge": dict(change.merge)}
+                for change in self.changes
+            ],
+        }
+
     @classmethod
     def parse(cls, value: object) -> "Plan":
         if not isinstance(value, dict) or value.keys() != {"version", "policy", "changes"}:

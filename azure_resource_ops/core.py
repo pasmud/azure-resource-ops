@@ -91,6 +91,8 @@ class Policy:
         if not isinstance(protected, list) or any(not key or not _text(key, 512) for key in protected):
             raise InputError("protected must be a list of valid tag names")
         normalized = frozenset(key.casefold() for key in protected)
+        if any(not _text(key, 512) for key in normalized):
+            raise InputError("normalized protected tag name exceeds the length limit")
         if len(normalized) != len(protected):
             raise InputError("duplicate protected tag name")
         ensure = tags(value["ensure"], managed=True)

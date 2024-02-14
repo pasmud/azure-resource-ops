@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import sys
 
+from .audit import audit_plan
 from .core import InputError, Policy, build_plan
 from .inventory import parse_inventory
 from .jsonio import read_json, render
@@ -24,6 +25,9 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--policy", type=Path, required=True, help="local policy JSON")
     validate = commands.add_parser("validate", help="validate a saved plan offline", allow_abbrev=False)
     validate.add_argument("--plan", type=Path, required=True, help="saved version 1 plan JSON")
+    audit = commands.add_parser("audit", help="summarize a saved plan without identifiers or tags",
+                                allow_abbrev=False)
+    audit.add_argument("--plan", type=Path, required=True, help="saved version 1 plan JSON")
     args = parser.parse_args(argv)
     try:
         if args.command == "plan":
@@ -31,8 +35,8 @@ def main(argv: list[str] | None = None) -> int:
             resources = parse_inventory(read_json(args.inventory, "inventory"))
             result = build_plan(resources, policy)
         else:
-            Plan.parse(read_json(args.plan, "plan"))
-            result = {"valid": True}
+            parsed = Plan.parse(read_json(args.plan, "plan"))
+            result = audit_plan(parsed) if args.command == "audit" else {"valid": True}
         sys.stdout.write(render(result))
     except InputError as exc:
         print(f"error: {exc}", file=sys.stderr)

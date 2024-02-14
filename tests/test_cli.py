@@ -53,3 +53,27 @@ def test_validation_rejects_unknown_fields_without_echoing_them(tmp_path):
     assert invalid.returncode == 2
     assert invalid.stdout == ""
     assert "fake-private" not in invalid.stderr
+
+
+def test_audit_counts_changes_and_redacts_plan_content(tmp_path):
+    plan = tmp_path / "plan.json"
+    digest = "1234" * 16
+    first = {"id": BASE + "fake-private-a", "before_sha256": digest, "merge": {"fake-tag": "fake-value"}}
+    second = first | {"id": BASE + "fake-private-b", "merge": {"extra": "another", "fake-tag": "fake-value"}}
+    policy = {
+        "subscriptions": [SUB, "22222222-2222-4222-8222-222222222222"],
+        "ensure": second["merge"], "protected": ["fake-protected"],
+    }
+    value = {"version": 1, "policy": policy, "changes": [second, first]}
+    plan.write_text(json.dumps(value), encoding="utf-8")
+    report = run_cli("audit", "--plan", plan)
+    assert report.returncode == 0, report.stderr
+    assert not any(text in report.stdout for text in (SUB, digest, "fake-", "another"))
+    result = json.loads(report.stdout)
+    assert result["summary"] == {"scoped_subscription_count": 2, "targeted_subscription_count": 1,
+                                 "resource_count": 2, "assignment_count": 3}
+    assert result["changes"] == [{"change": 1, "assignment_count": 1}, {"change": 2, "assignment_count": 2}]
+    plan.write_text(json.dumps(value | {"changes": [first, second]}, indent=4), encoding="utf-8")
+    assert run_cli("audit", "--plan", plan).stdout == report.stdout
+    plan.write_text(json.dumps(value | {"changes": [first]}), encoding="utf-8")
+    assert json.loads(run_cli("audit", "--plan", plan).stdout)["plan_sha256"] != result["plan_sha256"]
