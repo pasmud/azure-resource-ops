@@ -80,6 +80,9 @@ establish that the inventory is current. Review the effective policy before use.
 one-based position in resource-ID order. It omits resource and subscription
 IDs, tag names and values, and individual snapshot fingerprints. The digest
 identifies the normalized plan, not its author; the report still reveals counts.
+Redacted reports identify their schema with `kind` and `report_version` (now
+`2`). The `plan_audit` report has `status` `changes_planned` or `no_changes`.
+These report fields do not change the version 1 plan format or canonical digest.
 
 ## Opt-in application
 
@@ -117,6 +120,9 @@ Apply outputs a redacted JSON report with the plan digest, counts, and ordered
 change numbers. It never prints captured Azure CLI output or arguments. Exit
 `0` means each merge exited successfully (or none were needed); exit `2` means
 invalid input or approval; exit `3` means an incomplete apply with a report.
+The `plan_apply` report has `status` `applied`, `no_changes`, or `incomplete`;
+`complete` remains true for the first two outcomes. `applied` records CLI success,
+not verified live state.
 Per-change statuses are `merged` (CLI success, no read-back), `read_failed`
 (CLI error), `invalid_read` (unexpected response), `stale` (snapshot or delta
 mismatch), `merge_unconfirmed` (write errored or timed out; outcome may be

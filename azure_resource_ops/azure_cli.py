@@ -78,8 +78,9 @@ def apply_plan(value: object, subscriptions: list[str], approved_sha256: str, *,
         summary[status] += 1
         rows.append({"change": index, "status": status})
     return {
-        "report_version": 1,
+        "report_version": 2,
         "kind": "plan_apply",
+        "status": "no_changes" if not rows else "applied" if complete else "incomplete",
         "plan_sha256": digest,
         "complete": complete,
         "summary": summary,

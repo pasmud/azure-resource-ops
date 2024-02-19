@@ -59,6 +59,8 @@ def test_reviewed_plan_end_to_end_with_injected_runner(reviewed_plan, capsys, dr
     record = json.loads(captured.out)
     assert captured.err == "" and "fake" not in captured.out and SUB not in captured.out
     assert record["plan_sha256"] == digest and record["complete"] is (not drift)
+    assert (record["kind"], record["report_version"]) == ("plan_apply", 2)
+    assert record["status"] == ("incomplete" if drift else "applied")
     assert [change["status"] for change in record["changes"]] == statuses
     assert len(writes) == (1 if drift else 2)
     assert live[writes[0]]["Owner"] == "fake team"

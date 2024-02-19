@@ -80,6 +80,7 @@ def test_audit_counts_changes_and_redacts_plan_content(tmp_path):
     assert report.returncode == 0, report.stderr
     assert not any(text in report.stdout for text in (SUB, digest, "fake-", "another"))
     result = json.loads(report.stdout)
+    assert (result["kind"], result["report_version"], result["status"]) == ("plan_audit", 2, "changes_planned")
     assert result["summary"] == {"scoped_subscription_count": 2, "targeted_subscription_count": 1,
                                  "resource_count": 2, "assignment_count": 3}
     assert result["changes"] == [{"change": 1, "assignment_count": 1}, {"change": 2, "assignment_count": 2}]
@@ -87,6 +88,10 @@ def test_audit_counts_changes_and_redacts_plan_content(tmp_path):
     assert run_cli("audit", "--plan", plan).stdout == report.stdout
     plan.write_text(json.dumps(value | {"changes": [first]}), encoding="utf-8")
     assert json.loads(run_cli("audit", "--plan", plan).stdout)["plan_sha256"] != result["plan_sha256"]
+    plan.write_text(json.dumps(value | {"changes": []}), encoding="utf-8")
+    empty = run_cli("audit", "--plan", plan)
+    assert empty.returncode == 0
+    assert json.loads(empty.stdout)["status"] == "no_changes"
 
 
 def test_synthetic_walkthrough_and_detection_of_omitted_change(tmp_path):

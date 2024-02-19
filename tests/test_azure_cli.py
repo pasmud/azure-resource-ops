@@ -74,6 +74,7 @@ def test_empty_apply_issues_no_calls():
     value, approved = plan_for()
     report = apply_plan(value, [SUB], approved, runner=lambda _: pytest.fail("unexpected command"))
     assert report["complete"] and report["changes"] == []
+    assert report["status"] == "no_changes"
 
 
 @pytest.mark.parametrize(("output", "returncode", "expected"), [

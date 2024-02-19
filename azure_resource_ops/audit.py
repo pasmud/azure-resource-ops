@@ -17,8 +17,9 @@ def audit_plan(plan: Plan) -> dict:
         for index, change in enumerate(plan.changes, 1)
     ]
     return {
-        "report_version": 1,
+        "report_version": 2,
         "kind": "plan_audit",
+        "status": "changes_planned" if rows else "no_changes",
         "plan_sha256": plan_digest(plan),
         "summary": {
             "scoped_subscription_count": len(plan.policy.subscriptions),
