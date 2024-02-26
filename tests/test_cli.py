@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import subprocess
 import sys
 
@@ -77,3 +78,27 @@ def test_audit_counts_changes_and_redacts_plan_content(tmp_path):
     assert run_cli("audit", "--plan", plan).stdout == report.stdout
     plan.write_text(json.dumps(value | {"changes": [first]}), encoding="utf-8")
     assert json.loads(run_cli("audit", "--plan", plan).stdout)["plan_sha256"] != result["plan_sha256"]
+
+
+def test_synthetic_walkthrough_and_detection_of_omitted_change(tmp_path):
+    examples = Path(__file__).resolve().parents[1] / "examples"
+    inventory = examples / "inventory.graph.json"
+    plan = tmp_path / "plan.json"
+    dry_run = run_cli("plan", "--inventory", inventory, "--policy", examples / "policy.json")
+    assert dry_run.returncode == 0, dry_run.stderr
+    plan.write_text(dry_run.stdout, encoding="utf-8")
+    verify = ("validate", "--plan", plan, "--inventory", inventory)
+    validated = run_cli(*verify)
+    assert validated.returncode == 0, validated.stderr
+    assert json.loads(validated.stdout) == {"valid": True, "inventory_match": True}
+    audited = run_cli("audit", "--plan", plan)
+    assert audited.stdout == (examples / "audit.expected.json").read_text(encoding="utf-8")
+
+    edited = json.loads(dry_run.stdout)
+    edited["changes"].pop()
+    plan.write_text(json.dumps(edited), encoding="utf-8")
+    assert run_cli("validate", "--plan", plan).returncode == 0
+    mismatch = run_cli(*verify)
+    assert mismatch.returncode == 2
+    assert mismatch.stdout == ""
+    assert "does not match the supplied inventory" in mismatch.stderr

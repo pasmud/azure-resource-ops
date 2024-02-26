@@ -83,6 +83,13 @@ class Policy:
     ensure: dict[str, str]
     protected: frozenset[str]
 
+    def as_dict(self) -> dict:
+        return {
+            "subscriptions": list(self.subscriptions),
+            "ensure": dict(self.ensure),
+            "protected": sorted(self.protected),
+        }
+
     @classmethod
     def parse(cls, value: object) -> "Policy":
         if not isinstance(value, dict) or value.keys() != {"subscriptions", "ensure", "protected"}:
@@ -133,12 +140,4 @@ def build_plan(resources: list[Resource], policy: Policy) -> dict:
         merge = merge_for(policy, current)
         if merge:
             changes.append({"id": resource.id, "before_sha256": fingerprint(current), "merge": merge})
-    return {
-        "version": 1,
-        "policy": {
-            "subscriptions": list(policy.subscriptions),
-            "ensure": dict(policy.ensure),
-            "protected": sorted(policy.protected),
-        },
-        "changes": changes,
-    }
+    return {"version": 1, "policy": policy.as_dict(), "changes": changes}

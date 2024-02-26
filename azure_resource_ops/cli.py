@@ -25,6 +25,7 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--policy", type=Path, required=True, help="local policy JSON")
     validate = commands.add_parser("validate", help="validate a saved plan offline", allow_abbrev=False)
     validate.add_argument("--plan", type=Path, required=True, help="saved version 1 plan JSON")
+    validate.add_argument("--inventory", type=Path, help="also verify against the original saved inventory")
     audit = commands.add_parser("audit", help="summarize a saved plan without identifiers or tags",
                                 allow_abbrev=False)
     audit.add_argument("--plan", type=Path, required=True, help="saved version 1 plan JSON")
@@ -34,9 +35,14 @@ def main(argv: list[str] | None = None) -> int:
             policy = Policy.parse(read_json(args.policy, "policy"))
             resources = parse_inventory(read_json(args.inventory, "inventory"))
             result = build_plan(resources, policy)
+        elif args.command == "audit":
+            result = audit_plan(Plan.parse(read_json(args.plan, "plan")))
         else:
             parsed = Plan.parse(read_json(args.plan, "plan"))
-            result = audit_plan(parsed) if args.command == "audit" else {"valid": True}
+            result = {"valid": True}
+            if args.inventory is not None:
+                parsed.verify_inventory(parse_inventory(read_json(args.inventory, "inventory")))
+                result["inventory_match"] = True
         sys.stdout.write(render(result))
     except InputError as exc:
         print(f"error: {exc}", file=sys.stderr)

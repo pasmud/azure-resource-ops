@@ -1,0 +1,27 @@
+{
+  "count": 4,
+  "totalRecords": 4,
+  "resultTruncated": "false",
+  "data": [
+    {
+      "id": "/subscriptions/11111111-1111-4111-8111-111111111111/resourceGroups/fake-rg/providers/Microsoft.Storage/storageAccounts/fakeinventory",
+      "tags": {
+        "Environment": "sandbox",
+        "Owner": "fake team",
+        "Lifecycle": "keep"
+      }
+    },
+    {
+      "id": "/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/fake-outside-scope",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/11111111-1111-4111-8111-111111111111/resourceGroups/fake-already-converged",
+      "tags": {"environment": "demo", "CostCenter": "fake-finance"}
+    },
+    {
+      "id": "/subscriptions/11111111-1111-4111-8111-111111111111/resourceGroups/fake-untagged",
+      "tags": null
+    }
+  ]
+}

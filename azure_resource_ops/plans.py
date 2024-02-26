@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 import re
 
-from .core import InputError, Policy, resource_subscription, tags
+from .core import InputError, Policy, Resource, build_plan, resource_subscription, tags
 
 _DIGEST = re.compile(r"[0-9a-f]{64}")
 
@@ -23,16 +23,16 @@ class Plan:
     def as_dict(self) -> dict:
         return {
             "version": 1,
-            "policy": {
-                "subscriptions": list(self.policy.subscriptions),
-                "ensure": dict(self.policy.ensure),
-                "protected": sorted(self.policy.protected),
-            },
+            "policy": self.policy.as_dict(),
             "changes": [
                 {"id": change.id, "before_sha256": change.before_sha256, "merge": dict(change.merge)}
                 for change in self.changes
             ],
         }
+
+    def verify_inventory(self, resources: list[Resource]) -> None:
+        if build_plan(resources, self.policy) != self.as_dict():
+            raise InputError("plan does not match the supplied inventory and embedded policy")
 
     @classmethod
     def parse(cls, value: object) -> "Plan":

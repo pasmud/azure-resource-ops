@@ -1,0 +1,21 @@
+{
+  "changes": [
+    {
+      "assignment_count": 2,
+      "change": 1
+    },
+    {
+      "assignment_count": 2,
+      "change": 2
+    }
+  ],
+  "kind": "plan_audit",
+  "plan_sha256": "0136bbd42e366aafca46ecfd7bc550b715f6f27f15720e873d796d06dbdafba2",
+  "report_version": 1,
+  "summary": {
+    "assignment_count": 4,
+    "resource_count": 2,
+    "scoped_subscription_count": 1,
+    "targeted_subscription_count": 1
+  }
+}
