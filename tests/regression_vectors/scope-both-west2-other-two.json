@@ -1,0 +1,148 @@
+{
+  "title": "Select other-two in both-west2",
+  "inventory": [
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/western/providers/Fake.Provider/thingsExtra/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "BBBBBBBB-2222-4222-8222-222222222222",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/WEST/providers/Other.Provider/things/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "BBBBBBBB-2222-4222-8222-222222222222",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/WEST/providers/Fake.Provider/thingsExtra/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "BBBBBBBB-2222-4222-8222-222222222222",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/WEST/providers/Fake.Provider/things/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "BBBBBBBB-2222-4222-8222-222222222222",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/west-2/providers/Fake.Provider/things/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "BBBBBBBB-2222-4222-8222-222222222222",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/west/providers/Other.Provider/things/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "AAAAAAAA-1111-4111-8111-111111111111",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/west/providers/Fake.Provider/thingsExtra/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "AAAAAAAA-1111-4111-8111-111111111111",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/west/providers/Fake.Provider/things/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "AAAAAAAA-1111-4111-8111-111111111111",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    },
+    {
+      "id": "/subscriptions/aaaaaaaa-1111-4111-8111-111111111111/resourceGroups/west-2/providers/Other.Provider/extra/asset",
+      "tags": {
+        "Owner": "keep",
+        "Env.Legacy": "ready"
+      },
+      "subscriptionId": "AAAAAAAA-1111-4111-8111-111111111111",
+      "resourceGroup": "metadata-only",
+      "type": "Metadata.Provider/ignored"
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "aaaaaaaa-1111-4111-8111-111111111111",
+      "BBBBBBBB-2222-4222-8222-222222222222"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Env.Legacy",
+      "Owner"
+    ],
+    "resource_groups": [
+      "WEST-2"
+    ],
+    "resource_types": [
+      "Other.Provider/things",
+      "Fake.Provider/thingsExtra"
+    ]
+  },
+  "expected": {
+    "exit_code": 0,
+    "changes": [],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "no_changes",
+      "summary": {
+        "scoped_subscription_count": 2,
+        "targeted_subscription_count": 0,
+        "resource_count": 0,
+        "assignment_count": 0
+      },
+      "changes": []
+    },
+    "scope": {
+      "subscriptions": [
+        "aaaaaaaa-1111-4111-8111-111111111111",
+        "bbbbbbbb-2222-4222-8222-222222222222"
+      ],
+      "protected": [
+        "env.legacy",
+        "owner"
+      ],
+      "resource_groups": [
+        "west-2"
+      ],
+      "resource_types": [
+        "fake.provider/thingsextra",
+        "other.provider/things"
+      ]
+    }
+  }
+}
