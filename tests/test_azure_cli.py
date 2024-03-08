@@ -81,6 +81,7 @@ def test_empty_apply_issues_no_calls():
     (tag_response(RID, CURRENT | {"unrelated": "drift"}), 0, "stale"),
     (tag_response(RID + "-wrong"), 0, "invalid_read"),
     (tag_response(RID, {"Owner": "a", "OWNER": "b"}), 0, "invalid_read"),
+    (None, 0, "invalid_read"),
     ("fake-private-not-json", 0, "invalid_read"),
     (tag_response(RID), 1, "read_failed"),
 ])
@@ -95,6 +96,7 @@ def test_apply_stops_on_first_failed_read_or_drift(output, returncode, expected)
     report = apply_plan(value, [SUB], approved, runner=fake)
     assert not report["complete"]
     assert [row["status"] for row in report["changes"]] == [expected, "not_attempted"]
+    assert report["changes"][0].get("reason") == ("nonzero_exit" if returncode else None)
     assert len(calls) == 1 and calls[0][2] == "list"
     assert "fake-private" not in json.dumps(report)
 
@@ -123,7 +125,27 @@ def test_later_timeout_is_unconfirmed_and_earlier_merge_is_retained():
 
     report = apply_plan(value, [SUB], approved, runner=fake)
     assert [row["status"] for row in report["changes"]] == ["merged", "merge_unconfirmed", "not_attempted"]
+    assert report["changes"][1]["reason"] == "timeout"
     assert len(calls) == 4 and "fake-private" not in json.dumps(report)
+
+
+@pytest.mark.parametrize(("error", "reason"), [
+    (FileNotFoundError("fake-private-executable"), "runner_error"),
+    (subprocess.TimeoutExpired(["fake-private-argument"], 60), "timeout"),
+])
+def test_read_runner_exception_reports_redacted_reason_without_writes(error, reason):
+    value, approved = plan_for(RID, RID + "-next")
+
+    def fake(argv):
+        assert argv[2] == "list" and argv[4] == RID
+        raise error
+
+    report = apply_plan(value, [SUB], approved, runner=fake)
+    assert report["changes"] == [
+        {"change": 1, "status": "read_failed", "reason": reason},
+        {"change": 2, "status": "not_attempted"},
+    ]
+    assert "fake-private" not in json.dumps(report)
 
 
 @pytest.mark.skipif(os.name != "posix", reason="native apply runner requires POSIX")

@@ -74,3 +74,27 @@ def test_apply_requires_both_explicit_approvals(reviewed_plan, capsys, flags):
     assert exc.value.code == 2
     output = capsys.readouterr()
     assert not output.out and SUB not in output.err
+
+
+@pytest.mark.parametrize(("phase", "status"), [("list", "read_failed"), ("update", "merge_unconfirmed")])
+def test_interrupt_during_command_stops_apply_with_a_redacted_report(reviewed_plan, capsys, phase, status):
+    path, digest, live = reviewed_plan
+    calls = []
+
+    def fake(argv):
+        calls.append(argv[2])
+        if argv[2] == phase:
+            raise KeyboardInterrupt("fake-private-interrupt")
+        result = {"id": argv[4] + "/providers/Microsoft.Resources/tags/default",
+                  "properties": {"tags": live[argv[4]]}}
+        return CompletedProcess(argv, 0, json.dumps(result), "")
+
+    assert main(["apply", "--plan", str(path), "--subscription", SUB, "--approve-sha256", digest],
+                azure_runner=fake) == 3
+    captured = capsys.readouterr()
+    assert not captured.err and "fake-private" not in captured.out
+    assert json.loads(captured.out)["changes"] == [
+        {"change": 1, "status": status, "reason": "interrupted"},
+        {"change": 2, "status": "not_attempted"},
+    ]
+    assert calls == (["list"] if phase == "list" else ["list", "update"])

@@ -35,29 +35,40 @@ def _live_tags(output: str, target: str) -> dict[str, str]:
     return {} if properties["tags"] is None else tags(properties["tags"])
 
 
-def _apply_change(change: Change, plan: Plan, runner: Runner) -> str:
-    target = ["--resource-id", change.id, "--subscription", resource_subscription(change.id)]
+def _invoke(runner: Runner, argv: list[str]) -> tuple[str | None, str | None]:
+    """Return stdout or a fixed failure reason, never subprocess diagnostics."""
     try:
-        response = runner(["az", "tag", "list", *target, "--only-show-errors", "--output", "json"])
+        response = runner(argv)
+    except KeyboardInterrupt:
+        return None, "interrupted"
+    except subprocess.TimeoutExpired:
+        return None, "timeout"
     except _COMMAND_ERRORS:
-        return "read_failed"
+        return None, "runner_error"
     if response.returncode != 0:
-        return "read_failed"
+        return None, "nonzero_exit"
+    return response.stdout, None
+
+
+def _apply_change(change: Change, plan: Plan, runner: Runner) -> tuple[str, str | None]:
+    target = ["--resource-id", change.id, "--subscription", resource_subscription(change.id)]
+    output, reason = _invoke(runner, ["az", "tag", "list", *target, "--only-show-errors", "--output", "json"])
+    if reason is not None:
+        return "read_failed", reason
+    if not isinstance(output, str):
+        return "invalid_read", None
     try:
-        live = _live_tags(response.stdout, change.id)
+        live = _live_tags(output, change.id)
     except InputError:
-        return "invalid_read"
+        return "invalid_read", None
     if fingerprint(live) != change.before_sha256 or merge_for(plan.policy, live) != change.merge:
-        return "stale"
+        return "stale", None
     assignments = [f"{key}={change.merge[key]}" for key in sorted(change.merge)]
-    try:
-        response = runner([
-            "az", "tag", "update", *target, "--operation", "Merge", "--only-show-errors",
-            "--output", "none", "--tags", *assignments,
-        ])
-    except _COMMAND_ERRORS:
-        return "merge_unconfirmed"
-    return "merged" if response.returncode == 0 else "merge_unconfirmed"
+    _, reason = _invoke(runner, [
+        "az", "tag", "update", *target, "--operation", "Merge", "--only-show-errors",
+        "--output", "none", "--tags", *assignments,
+    ])
+    return ("merged", None) if reason is None else ("merge_unconfirmed", reason)
 
 
 def apply_plan(value: object, subscriptions: list[str], approved_sha256: str, *, runner: Runner = run_az) -> dict:
@@ -73,10 +84,13 @@ def apply_plan(value: object, subscriptions: list[str], approved_sha256: str, *,
     summary = dict.fromkeys(_STATUSES, 0)
     complete = True
     for index, change in enumerate(plan.changes, 1):
-        status = _apply_change(change, plan, runner) if complete else "not_attempted"
+        status, reason = _apply_change(change, plan, runner) if complete else ("not_attempted", None)
         complete = status == "merged"
         summary[status] += 1
-        rows.append({"change": index, "status": status})
+        row = {"change": index, "status": status}
+        if reason is not None:
+            row["reason"] = reason
+        rows.append(row)
     return {
         "report_version": 2,
         "kind": "plan_apply",

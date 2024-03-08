@@ -113,8 +113,10 @@ be overwritten, and an identical tag map cannot distinguish a resource that
 was deleted and recreated at the same ID. Azure permissions, resource tag
 limits and service-specific constraints can also reject a merge. Use a recent
 snapshot and coordinate with other tag writers. The tool stops at the first
-failure, does not roll back earlier writes, and does not retry. Reconcile live
-state and make a fresh plan before resuming, especially after a timeout.
+failure, does not roll back earlier writes, and does not retry. A timeout or
+Ctrl-C during a command stops the run and produces an incomplete report. An
+interrupted write may still take effect server-side. Reconcile live state and
+make a fresh plan before resuming.
 
 Apply outputs a redacted JSON report with the plan digest, counts, and ordered
 change numbers. It never prints captured Azure CLI output or arguments. Exit
@@ -125,8 +127,11 @@ The `plan_apply` report has `status` `applied`, `no_changes`, or `incomplete`;
 not verified live state.
 Per-change statuses are `merged` (CLI success, no read-back), `read_failed`
 (CLI error), `invalid_read` (unexpected response), `stale` (snapshot or delta
-mismatch), `merge_unconfirmed` (write errored or timed out; outcome may be
+mismatch), `merge_unconfirmed` (write did not return success; outcome may be
 unknown), and `not_attempted` (after an earlier failure).
+A failed command also records a fixed `reason`: `timeout`, `interrupted`,
+`nonzero_exit`, or `runner_error` (for example, a missing executable). No raw
+exception text or process output is included.
 
 ## Install and develop
 
