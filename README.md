@@ -63,3 +63,44 @@ establish that the inventory is current. Review the effective policy before use.
 one-based position in resource-ID order. It omits resource and subscription
 IDs, tag names and values, and individual snapshot fingerprints. The digest
 identifies the normalized plan, not its author; the report still reveals counts.
+
+## Opt-in application
+
+`python -m azure_resource_ops apply --help` shows the write interface without
+calling Azure. The offline examples do not apply changes. The end-to-end tests
+apply the synthetic plan only to an injected in-memory fake.
+
+For an authorized operator on POSIX, `apply` requires a reviewed `--plan`, one
+`--subscription` UUID per subscription in the policy (the set must match
+exactly), and `--approve-sha256` from the audit of that reviewed plan. It uses
+the `az` executable on `PATH` and its existing session with tag read and write
+permissions limited to the intended resources. It does not log in or change
+the active account. Use a trusted `PATH` and avoid secrets in tags; desired
+tags are passed in process arguments and may be visible to local process
+inspection or Azure CLI logging independently of these reports.
+
+The adapter validates the whole plan and approvals before invoking `az`. For
+each target in order, it runs a scoped tag read, checks the returned target
+identity and full tag-map fingerprint, and recomputes the delta. Only a match
+permits `az tag update` with `Merge` and only the delta assignments. Both calls
+have explicit resource and subscription arguments. The runner uses an argument
+vector with no shell, closed stdin, captured output, and a 60-second timeout per
+command. The native adapter has not been tested against an Azure tenant.
+
+**The tag read and write are not atomic.** The CLI merge path does not supply
+an ETag precondition. A concurrent change after the read to a managed value can
+be overwritten, and an identical tag map cannot distinguish a resource that
+was deleted and recreated at the same ID. Azure permissions, resource tag
+limits and service-specific constraints can also reject a merge. Use a recent
+snapshot and coordinate with other tag writers. The tool stops at the first
+failure, does not roll back earlier writes, and does not retry. Reconcile live
+state and make a fresh plan before resuming, especially after a timeout.
+
+Apply outputs a redacted JSON report with the plan digest, counts, and ordered
+change numbers. It never prints captured Azure CLI output or arguments. Exit
+`0` means each merge exited successfully (or none were needed); exit `2` means
+invalid input or approval; exit `3` means an incomplete apply with a report.
+Per-change statuses are `merged` (CLI success, no read-back), `read_failed`
+(CLI error), `invalid_read` (unexpected response), `stale` (snapshot or delta
+mismatch), `merge_unconfirmed` (write errored or timed out; outcome may be
+unknown), and `not_attempted` (after an earlier failure).

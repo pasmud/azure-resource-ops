@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 
 import pytest
@@ -124,6 +125,7 @@ def test_later_timeout_is_unconfirmed_and_earlier_merge_is_retained():
     assert len(calls) == 4 and "fake-private" not in json.dumps(report)
 
 
+@pytest.mark.skipif(os.name != "posix", reason="native apply runner requires POSIX")
 def test_native_runner_invokes_subprocess_without_shell_or_stdin(monkeypatch):
     def fake(argv, **kwargs):
         assert argv == ["az", "tag", "list"]
