@@ -1,0 +1,10 @@
+{
+  "subscriptions": [
+    "11111111-1111-4111-8111-111111111111",
+    "22222222-2222-4222-8222-222222222222"
+  ],
+  "resource_groups": ["rg-settlement-data"],
+  "resource_types": ["Microsoft.Storage/storageAccounts"],
+  "ensure": {"Environment": "production", "CostCenter": "cc-4100"},
+  "protected": ["Owner"]
+}

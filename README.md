@@ -27,6 +27,9 @@ Use `plan --exit-code` in automation to distinguish a nonempty plan (exit `4`)
 from a no-op (exit `0`). Both outcomes write the same plan JSON as the default
 mode, which exits `0` on any successful plan. Invalid input still exits `2`.
 
+For a scoped rollout and recovery from partial application, see the
+[two-subscription drift tutorial](examples/two-subscriptions/README.md).
+
 ### Inputs and merge semantics
 
 - **Inventory:** UTF-8 JSON array as saved from `az resource list`, or a
