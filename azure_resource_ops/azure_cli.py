@@ -1,8 +1,8 @@
 """Opt-in scoped merge adapter. The runner boundary is injectable for offline tests."""
 
-from collections.abc import Callable
 import os
 import subprocess
+from collections.abc import Callable
 
 from .audit import plan_digest
 from .core import InputError, fingerprint, merge_for, resource_subscription, scope, tags

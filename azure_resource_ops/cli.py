@@ -1,8 +1,8 @@
 """Offline commands and explicitly approved application of a saved plan."""
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from .audit import audit_plan
 from .azure_cli import Runner, apply_plan, run_az

@@ -1,7 +1,7 @@
 """Strict validation for the serialized version 1 merge plan."""
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 from .core import InputError, Policy, Resource, build_plan, resource_subscription, tags
 

@@ -1,7 +1,7 @@
 import json
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 SUB = "aaaaaaaa-1111-4111-8111-111111111111"
 BASE = f"/subscriptions/{SUB}/resourceGroups/"

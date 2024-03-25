@@ -104,3 +104,18 @@ Per-change statuses are `merged` (CLI success, no read-back), `read_failed`
 (CLI error), `invalid_read` (unexpected response), `stale` (snapshot or delta
 mismatch), `merge_unconfirmed` (write errored or timed out; outcome may be
 unknown), and `not_attempted` (after an earlier failure).
+
+## Install and develop
+
+The offline CLI has no runtime dependencies beyond Python 3.11+. In a virtual
+environment, `python -m pip install .` installs the `azure-resource-ops` command
+as an alternative to `python -m azure_resource_ops`. To run the project checks:
+
+```sh
+python -m pip install '.[dev]'
+ruff check azure_resource_ops tests
+python -m pytest -q --basetemp=.pytest_cache/work
+```
+
+GitHub Actions runs lint, the offline suite, and an installed-command smoke
+test on Python 3.11 and 3.14 on pushes and pull requests.

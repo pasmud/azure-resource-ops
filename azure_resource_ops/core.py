@@ -1,9 +1,9 @@
 """Policy and deterministic, additive planning."""
 
-from dataclasses import dataclass
 import hashlib
 import json
 import re
+from dataclasses import dataclass
 
 
 class InputError(ValueError):

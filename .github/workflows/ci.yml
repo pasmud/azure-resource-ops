@@ -1,0 +1,35 @@
+name: Offline checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install package and test tools
+        run: python -m pip install '.[dev]'
+      - name: Lint
+        run: ruff check azure_resource_ops tests
+      - name: Test without Azure
+        run: python -m pytest -q --basetemp=.pytest_cache/work
+      - name: Run installed CLI on synthetic inputs
+        working-directory: ${{ runner.temp }}
+        run: |
+          examples="$GITHUB_WORKSPACE/examples"
+          azure-resource-ops plan --inventory "$examples/inventory.graph.json" --policy "$examples/policy.json" > plan.json
+          azure-resource-ops validate --plan plan.json --inventory "$examples/inventory.graph.json"
+          azure-resource-ops audit --plan plan.json > audit.json
+          diff -u "$examples/audit.expected.json" audit.json
