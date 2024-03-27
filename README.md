@@ -114,7 +114,7 @@ as an alternative to `python -m azure_resource_ops`. To run the project checks:
 ```sh
 python -m pip install '.[dev]'
 ruff check azure_resource_ops tests
-python -m pytest -q --basetemp=.pytest_cache/work
+python -m pytest -q
 ```
 
 GitHub Actions runs lint, the offline suite, and an installed-command smoke

@@ -24,7 +24,7 @@ jobs:
       - name: Lint
         run: ruff check azure_resource_ops tests
       - name: Test without Azure
-        run: python -m pytest -q --basetemp=.pytest_cache/work
+        run: python -m pytest -q
       - name: Run installed CLI on synthetic inputs
         working-directory: ${{ runner.temp }}
         run: |
