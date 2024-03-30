@@ -1,0 +1,132 @@
+{
+  "title": "Refresh unmanaged-blank-added with peer-regresses",
+  "inventory": [
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/ops-archive",
+      "tags": null
+    },
+    {
+      "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/ops",
+      "tags": {
+        "eNv": "ready"
+      }
+    },
+    {
+      "id": "/subscriptions/AAAAAAAA-1111-4111-8111-111111111111/resourceGroups/Ops",
+      "tags": {}
+    }
+  ],
+  "policy": {
+    "subscriptions": [
+      "bbbbbbbb-2222-4222-8222-222222222222",
+      "aaaaaaaa-1111-4111-8111-111111111111"
+    ],
+    "ensure": {
+      "Env": "ready"
+    },
+    "protected": [
+      "Owner",
+      "STRASSE"
+    ],
+    "resource_groups": [
+      "OPS"
+    ]
+  },
+  "expected": {
+    "exit_code": 4,
+    "changes": [
+      {
+        "id": "/subscriptions/AAAAAAAA-1111-4111-8111-111111111111/resourceGroups/Ops",
+        "merge": {
+          "Env": "ready"
+        }
+      }
+    ],
+    "audit": {
+      "report_version": 2,
+      "kind": "plan_audit",
+      "status": "changes_planned",
+      "summary": {
+        "scoped_subscription_count": 2,
+        "targeted_subscription_count": 1,
+        "resource_count": 1,
+        "assignment_count": 1
+      },
+      "changes": [
+        {
+          "change": 1,
+          "assignment_count": 1
+        }
+      ]
+    },
+    "before_sha256": [
+      "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    ]
+  },
+  "refresh": {
+    "inventory": {
+      "data": [
+        {
+          "id": "/subscriptions/AAAAAAAA-1111-4111-8111-111111111111/resourceGroups/Ops",
+          "tags": {
+            "Other": ""
+          }
+        },
+        {
+          "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/ops",
+          "tags": {}
+        },
+        {
+          "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/ops-archive",
+          "tags": {
+            "Owner": "outside scope changed"
+          }
+        }
+      ],
+      "count": 3
+    },
+    "inventory_match": false,
+    "expected": {
+      "exit_code": 4,
+      "changes": [
+        {
+          "id": "/subscriptions/AAAAAAAA-1111-4111-8111-111111111111/resourceGroups/Ops",
+          "merge": {
+            "Env": "ready"
+          }
+        },
+        {
+          "id": "/subscriptions/bbbbbbbb-2222-4222-8222-222222222222/resourceGroups/ops",
+          "merge": {
+            "Env": "ready"
+          }
+        }
+      ],
+      "audit": {
+        "report_version": 2,
+        "kind": "plan_audit",
+        "status": "changes_planned",
+        "summary": {
+          "scoped_subscription_count": 2,
+          "targeted_subscription_count": 2,
+          "resource_count": 2,
+          "assignment_count": 2
+        },
+        "changes": [
+          {
+            "change": 1,
+            "assignment_count": 1
+          },
+          {
+            "change": 2,
+            "assignment_count": 1
+          }
+        ]
+      },
+      "before_sha256": [
+        "186f6874e07357f245368ad9380f467fc07530d9b84bb7789ac5f8d4ab021f25",
+        "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      ]
+    }
+  }
+}
